@@ -62,9 +62,9 @@ class Data_preprocessing:
 
             preprocessor=self.initiate_data_Preprocesiing()
 
-            X_train=train_data.drop(columns=["placement_status","salary_package_lpa"])
+            X_train=train_data.drop(columns=["placement_status"])
             y_train=train_data["placement_status"]
-            X_test=test_data.drop(columns=["placement_status","salary_package_lpa"])
+            X_test=test_data.drop(columns=["placement_status"])
             y_test=test_data["placement_status"]
 
             logging.info("data split in target columns")
