@@ -109,33 +109,7 @@ Placement-Prediction
 
 ---
 
-## How to Run the Project Locally
 
-### 1. Clone the repository
-
-```
-git clone https://github.com/omkarkamate/Placement-Prediction.git
-```
-
-### 2. Navigate to the project directory
-
-```
-cd Placement-Prediction
-```
-
-### 3. Install required dependencies
-
-```
-pip install -r requirements.txt
-```
-
-### 4. Run the application
-
-```
-streamlit run app.py
-```
-
----
 
 ## Model Performance
 
