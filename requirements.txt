@@ -3,3 +3,5 @@ numpy
 matplotlib
 setuptools
 streamlit
+scikit-learn
+xgboost
