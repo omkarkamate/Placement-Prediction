@@ -3,6 +3,7 @@ from src.placement_prediction.exception import Cu_Exception
 import pandas as pd
 import os
 import sys
+from sklearn.model_selection import train_test_split
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler
@@ -26,7 +27,7 @@ class Data_preprocessing:
     def initiate_data_Preprocesiing(self):
         try:
 
-            num_columns=["age","cgpa","internships_count","projects_count","certifications_count","communication_skill_score","backlogs"]
+            num_columns=["cgpa","internships_count","projects_count","certifications_count","communication_skill_score","backlogs"]
             cat_columns=["branch","college_tier"]
 
            
@@ -54,18 +55,18 @@ class Data_preprocessing:
         except(Exception) as e:
             raise Cu_Exception(e,sys)
         
-    def Data_Preprocess(self,train_path,test_path):
+    def Data_Preprocess(self,data):
         try:
             
-            train_data=pd.read_csv(train_path)
-            test_data=pd.read_csv(test_path)
+            dataa=pd.read_csv(data)
 
             preprocessor=self.initiate_data_Preprocesiing()
 
-            X_train=train_data.drop(columns=["placement_status"])
-            y_train=train_data["placement_status"]
-            X_test=test_data.drop(columns=["placement_status"])
-            y_test=test_data["placement_status"]
+            X=dataa.drop(columns=["placement_status"])
+            y=dataa["placement_status"]
+
+            
+            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=42)
 
             logging.info("data split in target columns")
 
