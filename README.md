@@ -96,11 +96,15 @@ Placement-Prediction
 ├── src
 │   └── placement_prediction
 │        └── components
-│            └── model_trainer.py
+│            └── Data Ingestion
+|            └── Data Preprocessing
+|            └── Model_trainer.py
 │
 ├── app.py
 ├── requirements.txt
 ├── README.md
+├── setup.py
+├── template.py
 ```
 
 ---
