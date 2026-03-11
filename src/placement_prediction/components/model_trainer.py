@@ -27,7 +27,7 @@ class model_training:
     
     def initiate_model_training(self,path):
         raw_df=pd.read_csv(path)
-        raw_df=raw_df.sample(500)
+        # raw_df=raw_df.sample(500)
         raw_df["placement_status"] = raw_df["placement_status"].map({"Not Placed": 0,"Placed": 1})
         logging.info("Reading raw data")
         X=raw_df.drop(["placement_status"],axis=1)
@@ -44,7 +44,7 @@ class model_training:
         logging.info("preprocessing data")
 
         models={
-            "LogisticRegression":LogisticRegression(),
+            "LogisticRegression":LogisticRegression(class_weight="balanced"),
             "Tree":DecisionTreeClassifier(),
             "svm":SVC(kernel="rbf"),
             "Random_Forest":RandomForestClassifier(n_estimators=100,random_state=42),
