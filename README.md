@@ -147,6 +147,6 @@ Student is likely to be PLACED
 
 ## Author
 
-Omkar Kamate
+Omkar Kamate.
 
 Aspiring Data Scientist / Machine Learning Engineer
