@@ -1,4 +1,4 @@
-# Student Placement Prediction System
+## Student Placement Prediction System
 
 
 A Machine Learning web application that predicts whether a student is likely to be **placed or not placed** based on academic performance and skill-related attributes. The system uses a trained classification model and provides predictions through an interactive web interface.
