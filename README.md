@@ -19,6 +19,7 @@ This project uses machine learning to analyze these factors and predict placemen
 
 The application allows users to input student details and receive a prediction about placement likelihood.
 
+
 ---
 
 ## Machine Learning Workflow
