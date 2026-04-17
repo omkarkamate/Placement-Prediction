@@ -5,3 +5,4 @@ setuptools
 streamlit
 scikit-learn
 xgboost
+pymongo
