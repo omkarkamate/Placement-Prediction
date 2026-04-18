@@ -9,7 +9,6 @@ import os
 if __name__ == "__main__":
     try:
 
-        # 🔥 MongoDB Connection (SAFE VERSION)
         MONGO_URI = os.getenv("MONGO_URI")
 
         if not MONGO_URI:
@@ -19,22 +18,20 @@ if __name__ == "__main__":
         client = MongoClient(
             MONGO_URI,
             tls=True,
-            tlsAllowInvalidCertificates=True  # 🔥 Fix SSL issue
+            tlsAllowInvalidCertificates=True 
         )
 
         db = client["placement_db"]
         collection = db["students"]
 
-        # Title
+       
         st.title("🎓 Placement Prediction App")
 
-        # Load model and preprocessor
         model = pickle.load(open("artifacts/model.pkl", "rb"))
         preprocessor = pickle.load(open("artifacts/Data_Preprocessing.pkl", "rb"))
 
         st.header("Enter Student Details")
 
-        # Inputs
         cgpa = st.number_input("CGPA", min_value=3.5, max_value=10.0, step=0.2)
 
         branch = st.selectbox(
@@ -54,7 +51,6 @@ if __name__ == "__main__":
         communication_skill_score = st.slider("Communication Skill Score", 0, 10)
         backlogs = st.number_input("Backlogs", min_value=0, step=1)
 
-        # 🔮 Predict button
         if st.button("Predict Placement"):
 
             data = {
@@ -70,10 +66,8 @@ if __name__ == "__main__":
 
             df = pd.DataFrame(data)
 
-            # Preprocess
             transformed_data = preprocessor.transform(df)
 
-            # Predict
             prediction = model.predict(transformed_data)
             result = "Placed" if prediction[0] == 1 else "Not Placed"
 
@@ -82,7 +76,6 @@ if __name__ == "__main__":
             else:
                 st.error("❌ Student is likely to be NOT PLACED")
 
-            # 💾 Save to MongoDB
             try:
                 save_data = {
                     "cgpa": cgpa,
@@ -102,7 +95,6 @@ if __name__ == "__main__":
             except Exception as db_error:
                 st.error(f"❌ Failed to save data: {db_error}")
 
-        # 📊 Show Stored Data
         if st.button("Show Stored Data"):
             try:
                 data = list(collection.find({}, {"_id": 0}))
