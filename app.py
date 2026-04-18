@@ -1,5 +1,4 @@
 from src.placement_prediction.exception import Cu_Exception
-from src.placement_prediction.components.model_trainer import model_training
 import pandas as pd
 import sys
 import pickle
@@ -7,12 +6,22 @@ import streamlit as st
 from pymongo import MongoClient
 import os
 
-if __name__=="__main__":
+if __name__ == "__main__":
     try:
 
-        # 🔥 MongoDB Connection (use env variable for deployment)
+        # 🔥 MongoDB Connection (SAFE VERSION)
         MONGO_URI = os.getenv("MONGO_URI")
-        client = MongoClient(MONGO_URI)
+
+        if not MONGO_URI:
+            st.error("❌ MONGO_URI not found. Check Render environment variable.")
+            st.stop()
+
+        client = MongoClient(
+            MONGO_URI,
+            tls=True,
+            tlsAllowInvalidCertificates=True  # 🔥 Fix SSL issue
+        )
+
         db = client["placement_db"]
         collection = db["students"]
 
@@ -30,40 +39,33 @@ if __name__=="__main__":
 
         branch = st.selectbox(
             "Branch",
-            ["CSE", "IT", "ECE", "EEE","Mechanical", "Civil"]
+            ["CSE", "IT", "ECE", "EEE", "Mechanical", "Civil"]
         )
 
         college_tier = st.selectbox(
             "College Tier",
-            ["Tier 1","Tier 2","Tier 3"]
+            ["Tier 1", "Tier 2", "Tier 3"]
         )
 
         internships_count = st.number_input("Internships Count", min_value=0, step=1)
-
         projects_count = st.number_input("Projects Count", min_value=0, step=1)
-
         certifications_count = st.number_input("Certifications Count", min_value=0, step=1)
 
-        communication_skill_score = st.slider(
-            "Communication Skill Score",
-            0,10
-        )
-
+        communication_skill_score = st.slider("Communication Skill Score", 0, 10)
         backlogs = st.number_input("Backlogs", min_value=0, step=1)
 
-
-        # Predict button
+        # 🔮 Predict button
         if st.button("Predict Placement"):
 
             data = {
-                "cgpa":[cgpa],
-                "branch":[branch],
-                "college_tier":[college_tier],
-                "internships_count":[internships_count],
-                "projects_count":[projects_count],
-                "certifications_count":[certifications_count],
-                "communication_skill_score":[communication_skill_score],
-                "backlogs":[backlogs]
+                "cgpa": [cgpa],
+                "branch": [branch],
+                "college_tier": [college_tier],
+                "internships_count": [internships_count],
+                "projects_count": [projects_count],
+                "certifications_count": [certifications_count],
+                "communication_skill_score": [communication_skill_score],
+                "backlogs": [backlogs]
             }
 
             df = pd.DataFrame(data)
@@ -73,7 +75,6 @@ if __name__=="__main__":
 
             # Predict
             prediction = model.predict(transformed_data)
-
             result = "Placed" if prediction[0] == 1 else "Not Placed"
 
             if prediction[0] == 1:
@@ -81,27 +82,40 @@ if __name__=="__main__":
             else:
                 st.error("❌ Student is likely to be NOT PLACED")
 
-            # 🔥 Save to MongoDB
-            save_data = {
-                "cgpa": cgpa,
-                "branch": branch,
-                "college_tier": college_tier,
-                "internships_count": internships_count,
-                "projects_count": projects_count,
-                "certifications_count": certifications_count,
-                "communication_skill_score": communication_skill_score,
-                "backlogs": backlogs,
-                "prediction": result
-            }
+            # 💾 Save to MongoDB
+            try:
+                save_data = {
+                    "cgpa": cgpa,
+                    "branch": branch,
+                    "college_tier": college_tier,
+                    "internships_count": internships_count,
+                    "projects_count": projects_count,
+                    "certifications_count": certifications_count,
+                    "communication_skill_score": communication_skill_score,
+                    "backlogs": backlogs,
+                    "prediction": result
+                }
 
-            collection.insert_one(save_data)
+                collection.insert_one(save_data)
+                st.success("📁 Data saved successfully!")
 
+            except Exception as db_error:
+                st.error(f"❌ Failed to save data: {db_error}")
 
-        # 🔥 Optional: Show Stored Data
+        # 📊 Show Stored Data
         if st.button("Show Stored Data"):
-            data = list(collection.find({}, {"_id": 0}))
-            st.dataframe(pd.DataFrame(data))
+            try:
+                data = list(collection.find({}, {"_id": 0}))
 
+                if data:
+                    df = pd.DataFrame(data)
+                    st.dataframe(df)
+                else:
+                    st.warning("No data found")
+
+            except Exception as fetch_error:
+                st.error(f"❌ Error fetching data: {fetch_error}")
 
     except Exception as e:
-        raise Cu_Exception(e,sys)
+        st.error(f"❌ App crashed: {e}")
+        raise Cu_Exception(e, sys)
